@@ -1,5 +1,7 @@
 # Proxy Account Router
 
+[中文文档](README.zh-CN.md)
+
 Proxy Account Router gives each AI account a stable local SOCKS5 port and
 routes that port to a healthy upstream proxy node. It is useful when an app has
 many accounts, each account needs a fixed proxy entrypoint, and the real
