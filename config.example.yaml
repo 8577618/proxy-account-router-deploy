@@ -1,0 +1,90 @@
+listen_host: "0.0.0.0"
+node_source: "clash"
+upstream_socks_host: "127.0.0.1"
+clash_profile_paths:
+  - "/clash/profiles/example.yaml"
+managed_sing_box:
+  enabled: true
+  binary_path: "/usr/local/bin/sing-box"
+  config_path: "/app/data/managed-sing-box.json"
+  work_dir: "/app/data"
+  listen_host: "127.0.0.1"
+  node_port_start: 19200
+  node_port_end: 19399
+state_path: "/app/data/state.json"
+
+reload_interval: 30s
+health_interval: 45s
+health_timeout: 8s
+health_url: "https://www.gstatic.com/generate_204"
+health_min_successes: 2
+healthy_after_successes: 1
+unhealthy_after_failures: 1
+allow_region_fallback: true
+region_fallbacks: ["JPN", "USA", "SGP", "TWN", "KOR", "GBR"]
+client_handshake_timeout: 10s
+upstream_dial_timeout: 20s
+max_health_concurrency: 8
+sync_timeout: 45s
+
+auto_sync:
+  enabled: true
+  interval: 30s
+  listen_port_start: 19100
+  listen_port_end: 19199
+  proxy_host: "proxy-account-router"
+  cliproxyapi:
+    enabled: true
+    auth_dir: "/cliproxyapi/auths"
+  sub2api:
+    enabled: true
+    # Clear Sub2API temp-unschedulable state only when the reason is a
+    # proxy/network transport error and the router has a healthy current or
+    # replacement node under the account's region/fallback policy. Recovery
+    # uses targeted health checks for the affected account's candidate nodes,
+    # so a slow full-node health sweep will not keep the Sub2API temp flag set.
+    recover_proxy_temp_unschedulable: true
+    env_file: "/sub2api/.env"
+    host: "sub2api-postgres"
+    port: 5432
+    user: "sub2api"
+    dbname: "sub2api"
+    sslmode: "disable"
+
+# Aliases let short tags from sub2socks5 ports map to a stable region lock.
+region_aliases:
+  US: USA
+  JP: JPN
+  KO: KOR
+  KR: KOR
+  SG: SGP
+  TW: TWN
+  HK: HKG
+  UK: GBR
+  GB: GBR
+
+# Each account gets a stable local SOCKS5 port. If region is empty, the router
+# picks a first region and persists it in data/state.json; future switches stay
+# within that locked region. Set strict_region: true for hard region locks.
+# fixed_proxy pins an account to one external proxy and disables node failover
+# for that account; if that proxy is down, the request simply fails. The
+# plural fixed_proxies field is reserved for future rotation, but only one
+# entry is accepted for now.
+accounts:
+  - name: "example-account-1"
+    project: "manual"
+    listen_port: 19101
+    region: "USA"
+    strict_region: true
+
+  - name: "example-account-2"
+    project: "manual"
+    listen_port: 19102
+    preferred_regions: ["USA", "JPN", "SGP"]
+
+  - name: "example-fixed-proxy"
+    project: "manual"
+    listen_port: 19103
+    fixed_proxy:
+      type: "socks5"
+      url: "socks5://user:pass@203.0.113.10:1080"

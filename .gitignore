@@ -1,0 +1,13 @@
+# Local config and runtime state
+config.yaml
+data/
+profiles/
+
+# Build outputs
+proxy-account-router
+proxy-account-router.*
+
+# Local noise
+*.log
+*.tmp
+*.bak

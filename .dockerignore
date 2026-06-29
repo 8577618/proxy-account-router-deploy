@@ -1,0 +1,9 @@
+.git
+config.yaml
+data/
+profiles/
+proxy-account-router
+proxy-account-router.*
+*.log
+*.tmp
+*.bak

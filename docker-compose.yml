@@ -1,0 +1,32 @@
+name: proxy-account-router-deploy
+
+services:
+  proxy-account-router:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proxy-account-router
+    restart: unless-stopped
+    ports:
+      - "${PROXY_ACCOUNT_ROUTER_STATUS_PORT:-127.0.0.1:19080}:19080"
+      - "${PROXY_ACCOUNT_ROUTER_SOCKS_RANGE:-127.0.0.1:19100-19199}:19100-19199"
+    volumes:
+      - ./config.yaml:/app/config.yaml:ro
+      - ./data:/app/data
+      - ${CLASH_PROFILE_DIR:-./profiles}:/clash/profiles:ro
+      - ../sub2socks5-deploy/data:/sub2socks5/data:ro
+      - ../cliproxyapi-deploy/auths:/cliproxyapi/auths
+      - ../sub2api-deploy/.env:/sub2api/.env:ro
+    networks:
+      - ai-api-internal
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:19080/healthz >/dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  ai-api-internal:
+    external: true
+    name: sub2api-deploy_sub2api-network
