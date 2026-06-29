@@ -2,10 +2,10 @@
 
 [中文文档](README.zh-CN.md)
 
-Proxy Account Router gives each AI account a stable local SOCKS5 port and
-routes that port to a healthy upstream proxy node. It is useful when an app has
-many accounts, each account needs a fixed proxy entrypoint, and the real
-upstream nodes may change, fail, or be grouped by region.
+Proxy Account Router uses nodes from airport/Clash subscriptions to
+automatically assign independent proxy nodes to CPA and Sub2API account pools.
+Each account gets a stable local SOCKS5 port, while the router handles upstream
+node selection, health checks, region locks, and failover behind that port.
 
 Example:
 
